@@ -25,14 +25,15 @@ def get_menu(url):
     return menu,link
 
 def get_content(i,url):
-    
-    
-    
-def multi_work(link):
+
+
+
+def multi_work(menu,link):
 
 
 if __name__=='__main__':
     url='http://www.biquge.jp/275193_41/'
     menu,link=get_menu(url)
     time.sleep(random.uniform(0.5,1))
-    for i,txt in enumerate(menu):
+    multi_work(menu,link)
+
