@@ -1,4 +1,4 @@
-import time,random,requests,multiprocessing
+import time,random,requests,multiprocessing,os
 from bs4 import BeautifulSoup as bs
 
 allhead=['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36',
@@ -24,11 +24,28 @@ def get_menu(url):
         link.append(url+i.a['href'])
     return menu,link
 
-def get_content(i,url):
-
+def get_content(i,lin,name,tar):
+    try:
+        aa1 = requests.get(lin, headers={'user-agent': random.choice(allhead)})
+        bb1 = bs(aa1.content, 'lxml')
+        cc1 = bb1.find(id='content')
+        with open(tar+'/'+str(i)+'.txt','a') as f:
+            time.sleep(random.uniform(0.5,1))
+            f.write(name+'\n')
+            f.write(cc1.text.replace('\xa0',''))
+            f.write( '\n')
+    except:
+        print('')
 
 
 def multi_work(menu,link):
+    tar=os.getcwd() + str(url).split('/')[-1]
+    os.makedirs(tar)
+    p = multiprocessing.Pool(processes=10)
+    for i,lin in enumerate(link):
+        p.apply_async(get_content, args=(i,lin,menu[i],tar,))
+    p.close()
+    p.join()
 
 
 if __name__=='__main__':
@@ -36,4 +53,3 @@ if __name__=='__main__':
     menu,link=get_menu(url)
     time.sleep(random.uniform(0.5,1))
     multi_work(menu,link)
-
