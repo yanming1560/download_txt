@@ -16,6 +16,7 @@ allhead=['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, l
 def get_menu(url):      #获得目录以及链接
     menu=[]
     link=[]
+    title=[]
     aa = requests.get(url, headers={'user-agent': random.choice(allhead)})
     bb = bs(aa.content, 'lxml')
     cc=bb.find_all(class_='box_con')
@@ -23,7 +24,9 @@ def get_menu(url):      #获得目录以及链接
     for i in dd:
         menu.append(i.text)
         link.append(url+i.a['href'])
-    return menu,link
+    ee=bb.find(id='info')
+    title=ee.text
+    return menu,link,title
 
 def get_content(i,lin,name,tar):    #建立编号.txt文档，下载内容
     try:
@@ -49,22 +52,22 @@ def multi_work(menu,link,tar):      #输入目录，连接，文件夹
     p.close()
     p.join()
 
-def make_docx(menu,tar):     #建立word文件
+def make_docx(title,menu,tar):     #建立word文件
     f=Document()
-    f.add_heading(tar.split('\\')[-1],0)
+    f.add_heading(title,0)
     for root,dirs,files in os.walk(tar):
         print(len(files),'个文件')
     for i,name in enumerate(files):
         with open(tar+'\\'+name) as n:
             f.add_heading(menu[i],1)
-            f.add_heading(n.readlines())
-    f.save(tar.split('\\')[-1]+'.docx')
+            f.add_paragraph(n.readlines())
+    f.save(title.split('\n')[1]+'.docx')
 
 
 if __name__=='__main__':
     url='http://www.biquge.jp/275193_41/'
     print('目录获取。。。。')
-    menu,link=get_menu(url)     #获得目录以及链接
+    menu,link,title=get_menu(url)     #获得目录以及链接
     print('目录获取成功。。。建立文件夹。。。')
     time.sleep(random.uniform(0.5,1))
     tar = os.getcwd()+'\\' + url.split('/')[-2]     #建立下载文件夹
@@ -72,4 +75,4 @@ if __name__=='__main__':
     print('开始下载。。。。')
     multi_work(menu,link,tar)       #多线程下载
     print('下载结束。。。。制作word文档')
-    make_docx(menu,tar)
+    make_docx(title,menu,tar)
