@@ -12,7 +12,7 @@ allhead=['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, l
         'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
          ]
 
-def get_menu(url):
+def get_menu(url):      #获得目录以及链接
     menu=[]
     link=[]
     aa = requests.get(url, headers={'user-agent': random.choice(allhead)})
@@ -24,13 +24,13 @@ def get_menu(url):
         link.append(url+i.a['href'])
     return menu,link
 
-def get_content(i,lin,name,tar):
+def get_content(i,lin,name,tar):    #建立编号.txt文档，下载内容
     try:
         aa1 = requests.get(lin, headers={'user-agent': random.choice(allhead)})
         bb1 = bs(aa1.content, 'lxml')
         cc1 = bb1.find(id='content')
         with open(tar+'/'+str(i)+'.txt','a') as f:
-            time.sleep(random.uniform(0.5,1))
+            time.sleep(random.uniform(0.6,1))
             f.write(name+'\n')
             f.write(cc1.text.replace('\xa0',''))
             f.write( '\n')
@@ -38,9 +38,7 @@ def get_content(i,lin,name,tar):
         print('')
 
 
-def multi_work(menu,link):
-    tar=os.getcwd() + str(url).split('/')[-1]
-    os.makedirs(tar)
+def multi_work(menu,link,tar):      #输入目录，连接，文件夹
     p = multiprocessing.Pool(processes=10)
     for i,lin in enumerate(link):
         p.apply_async(get_content, args=(i,lin,menu[i],tar,))
@@ -50,6 +48,8 @@ def multi_work(menu,link):
 
 if __name__=='__main__':
     url='http://www.biquge.jp/275193_41/'
-    menu,link=get_menu(url)
+    menu,link=get_menu(url)     #获得目录以及链接
     time.sleep(random.uniform(0.5,1))
-    multi_work(menu,link)
+    tar = os.getcwd() + str(url).split('/')[-1]     #建立下载文件夹
+    os.makedirs(tar)
+    multi_work(menu,link,tar)       #多线程下载
