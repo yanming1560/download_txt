@@ -22,19 +22,22 @@ def get_menu(url):      #获得目录以及链接
     cc=bb.find_all(class_='box_con')
     dd=cc[1].find_all('dd')
     for i in dd:
-        menu.append(i.text)
-        link.append(url+i.a['href'])
-    ee=bb.find(id='info')
-    title=ee.text
+        menu.append(i.text)     #获得目录文本
+        link.append(url+i.a['href'])    #获得目录对应链接
+    ee=bb.find(id='info')       #获得标题信息
+    title=ee.text       #获得标题文本
     return menu,link,title
 
 def get_content(i,lin,name,tar):    #建立编号.txt文档，下载内容
     try:
         time.sleep(random.uniform(0.6,1))
         aa1 = requests.get(lin, headers={'user-agent': random.choice(allhead)})
+        time.sleep(random.uniform(0.6, 1))
         bb1 = bs(aa1.content, 'lxml')
         cc1 = bb1.find(id='content')
+        dd1=bb1.find(class_='bookname')
         with open(tar+'/'+str(i)+'.txt','a') as f:
+            f.write(dd1.find('h1').text+'\n')
             f.write(cc1.text.replace('\xa0',''))
             f.write( '\n')
             print('章节',i,'下载成功！')
@@ -46,7 +49,7 @@ def get_content(i,lin,name,tar):    #建立编号.txt文档，下载内容
 
 
 def multi_work(menu,link,tar):      #输入目录，连接，文件夹
-    p = multiprocessing.Pool(processes=10)
+    p = multiprocessing.Pool(processes=15)
     for i,lin in enumerate(link):
         p.apply_async(get_content, args=(i,lin,menu[i],tar,))
     p.close()
@@ -57,22 +60,23 @@ def make_docx(title,menu,tar):     #建立word文件
     f.add_heading(title,0)
     for root,dirs,files in os.walk(tar):
         print(len(files),'个文件')
-    for i,name in enumerate(files):
-        with open(tar+'\\'+name) as n:
+    for i in range(len(files)):
+        with open(tar+'\\'+str(i)+'.txt') as n:
             f.add_heading(menu[i],1)
             f.add_paragraph(n.readlines())
     f.save(title.split('\n')[1]+'.docx')
 
 
 if __name__=='__main__':
-    url='http://www.biquge.jp/275193_41/'
+    url='http://www.biquge.jp/257312_41/'
     print('目录获取。。。。')
     menu,link,title=get_menu(url)     #获得目录以及链接
     print('目录获取成功。。。建立文件夹。。。')
     time.sleep(random.uniform(0.5,1))
     tar = os.getcwd()+'\\' + url.split('/')[-2]     #建立下载文件夹
-    os.makedirs(tar)
+    #os.makedirs(tar)
     print('开始下载。。。。')
-    multi_work(menu,link,tar)       #多线程下载
+    #multi_work(menu,link,tar)       #多线程下载
     print('下载结束。。。。制作word文档')
     make_docx(title,menu,tar)
+    print('制作完成！')
