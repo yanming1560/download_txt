@@ -26,16 +26,19 @@ def get_menu(url):      #获得目录以及链接
 
 def get_content(i,lin,name,tar):    #建立编号.txt文档，下载内容
     try:
+        time.sleep(random.uniform(0.6,1))
         aa1 = requests.get(lin, headers={'user-agent': random.choice(allhead)})
         bb1 = bs(aa1.content, 'lxml')
         cc1 = bb1.find(id='content')
-        with open(tar+'/'+str(i)+'.txt','a') as f:
-            time.sleep(random.uniform(0.6,1))
+        with open(tar+'/'+str(i)+'.txt','a') as f:            
             f.write(name+'\n')
             f.write(cc1.text.replace('\xa0',''))
             f.write( '\n')
     except:
-        print('')
+        with open(tar+'/'+str(i)+'.txt','a') as f:            
+            f.write(name+'\n')
+            f.write('此章节内容错误')
+        print('此章节内容错误')
 
 
 def multi_work(menu,link,tar):      #输入目录，连接，文件夹
