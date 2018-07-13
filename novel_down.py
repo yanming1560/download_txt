@@ -38,7 +38,7 @@ def get_content(i,lin,name,tar):    #建立编号.txt文档，下载内容
         with open(tar+'/'+str(i)+'.txt','a') as f:            
             f.write(name+'\n')
             f.write('此章节内容错误')
-        print('此章节内容错误')
+        print('章节',i,'内容错误')
 
 
 def multi_work(menu,link,tar):      #输入目录，连接，文件夹
